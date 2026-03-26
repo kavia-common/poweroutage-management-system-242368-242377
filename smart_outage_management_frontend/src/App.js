@@ -112,12 +112,18 @@ function AuthedApp() {
 }
 
 // PUBLIC_INTERFACE
+export function AppRoutes() {
+  /** Route tree for the app, excluding the Router wrapper (useful for tests with MemoryRouter). */
+  return <AuthedApp />;
+}
+
+// PUBLIC_INTERFACE
 function App() {
   /** Application entry UI: providers + router. */
   return (
     <AuthProvider>
       <BrowserRouter>
-        <AuthedApp />
+        <AppRoutes />
       </BrowserRouter>
     </AuthProvider>
   );

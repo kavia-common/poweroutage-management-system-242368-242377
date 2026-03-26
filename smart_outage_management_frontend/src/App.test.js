@@ -1,11 +1,23 @@
 import React from "react";
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import App from "./App";
+import { MemoryRouter } from "react-router-dom";
+import App, { AppRoutes } from "./App";
+import { AuthProvider } from "./auth/AuthContext";
 
 function setAuthUser(user) {
   if (user) window.localStorage.setItem("som.auth.v1", JSON.stringify(user));
   else window.localStorage.removeItem("som.auth.v1");
+}
+
+function renderAt(pathname) {
+  return render(
+    <AuthProvider>
+      <MemoryRouter initialEntries={[pathname]}>
+        <AppRoutes />
+      </MemoryRouter>
+    </AuthProvider>
+  );
 }
 
 describe("App routing + auth/role guards + layout navigation", () => {
@@ -19,8 +31,7 @@ describe("App routing + auth/role guards + layout navigation", () => {
   });
 
   test("unauthenticated deep-link to protected route redirects to login", async () => {
-    window.history.pushState({}, "Outages", "/outages");
-    render(<App />);
+    renderAt("/outages");
     expect(await screen.findByRole("heading", { name: /sign in/i })).toBeInTheDocument();
   });
 
@@ -43,9 +54,8 @@ describe("App routing + auth/role guards + layout navigation", () => {
   test("admin can navigate to Settings via sidebar and back to Profile; sign out returns to login", async () => {
     // Pre-auth as admin so we land in authed area immediately
     setAuthUser({ email: "admin@utility.example", role: "admin" });
-    window.history.pushState({}, "Dashboard", "/dashboard");
 
-    render(<App />);
+    renderAt("/dashboard");
 
     expect(await screen.findByRole("heading", { name: /dashboard/i })).toBeInTheDocument();
 
@@ -67,9 +77,8 @@ describe("App routing + auth/role guards + layout navigation", () => {
 
   test("technician cannot access /analytics (role guard redirects to dashboard)", async () => {
     setAuthUser({ email: "tech@utility.example", role: "technician" });
-    window.history.pushState({}, "Analytics", "/analytics");
 
-    render(<App />);
+    renderAt("/analytics");
 
     // Should redirect to dashboard
     expect(await screen.findByRole("heading", { name: /dashboard/i })).toBeInTheDocument();
@@ -80,14 +89,11 @@ describe("App routing + auth/role guards + layout navigation", () => {
   test("dispatcher can access /reports, but not /settings", async () => {
     setAuthUser({ email: "dispatch@utility.example", role: "dispatcher" });
 
-    window.history.pushState({}, "Reports", "/reports");
-    render(<App />);
+    renderAt("/reports");
     expect(await screen.findByRole("heading", { name: /reports/i })).toBeInTheDocument();
 
-    // Navigate to settings directly; role guard should send us to dashboard.
-    window.history.pushState({}, "Settings", "/settings");
-    // Re-render app to pick up route change in this simple test setup.
-    render(<App />);
+    // Navigate to settings using a fresh render with deterministic initial route.
+    renderAt("/settings");
     expect(await screen.findByRole("heading", { name: /dashboard/i })).toBeInTheDocument();
   });
 });
