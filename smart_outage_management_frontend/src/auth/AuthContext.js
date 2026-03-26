@@ -12,16 +12,19 @@ function safeParse(json) {
   }
 }
 
+function readStoredUser() {
+  const raw = window.localStorage.getItem(STORAGE_KEY);
+  const parsed = raw ? safeParse(raw) : null;
+  if (parsed?.email && parsed?.role) return parsed;
+  return null;
+}
+
 // PUBLIC_INTERFACE
 export function AuthProvider({ children }) {
   /** Provides basic role-aware auth state (demo auth) for navigation and access control. */
-  const [user, setUser] = useState(null);
-
-  useEffect(() => {
-    const raw = window.localStorage.getItem(STORAGE_KEY);
-    const parsed = raw ? safeParse(raw) : null;
-    if (parsed?.email && parsed?.role) setUser(parsed);
-  }, []);
+  // Initialize from localStorage synchronously so routing guards are deterministic on first render.
+  // This avoids test flakiness where a protected deep-link briefly renders unauthenticated and redirects.
+  const [user, setUser] = useState(() => readStoredUser());
 
   useEffect(() => {
     if (user) window.localStorage.setItem(STORAGE_KEY, JSON.stringify(user));
