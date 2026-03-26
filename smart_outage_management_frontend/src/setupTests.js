@@ -28,44 +28,18 @@ beforeEach(() => {
   }
 });
 
-// Block XHR-based networking as well (jsdom can still attempt XMLHttpRequest connections,
-// which can produce ECONNREFUSED noise/flakiness in CI).
-beforeAll(() => {
-  if (!global.XMLHttpRequest) return;
-
-  const OriginalXHR = global.XMLHttpRequest;
-
-  class XHRMock {
-    constructor() {
-      this.readyState = 0;
-      this.status = 200;
-      this.responseText = "";
-      this.onreadystatechange = null;
-      this.onload = null;
-      this.onerror = null;
-      this._aborted = false;
-    }
-    open() {}
-    setRequestHeader() {}
-    abort() {
-      this._aborted = true;
-    }
-    send() {
-      // Resolve on next tick to simulate async behavior without network.
-      setTimeout(() => {
-        if (this._aborted) return;
-        this.readyState = 4;
-        if (typeof this.onreadystatechange === "function") this.onreadystatechange();
-        if (typeof this.onload === "function") this.onload();
-      }, 0);
-    }
-  }
-
-  // Preserve any static props CRA/jsdom might expect.
-  Object.assign(XHRMock, OriginalXHR);
-
-  global.XMLHttpRequest = XHRMock;
-});
+/**
+ * NOTE: Do not override XMLHttpRequest.
+ *
+ * CRA's Jest jsdom environment loads the whatwg-fetch polyfill, which implements fetch()
+ * on top of XMLHttpRequest and expects XHR APIs like getAllResponseHeaders().
+ *
+ * An incomplete XHR mock will break fetch() with:
+ *   TypeError: xhr.getAllResponseHeaders is not a function
+ *
+ * If you need to prevent network access in tests, prefer mocking global.fetch (either
+ * globally as we do above, or per-test), rather than overriding XMLHttpRequest.
+ */
 
 // Minimal WebSocket mock so ws client can construct without hitting network.
 if (!global.WebSocket) {
