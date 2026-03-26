@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../auth/AuthContext";
 import { PageHeader } from "../components/PageHeader";
@@ -21,10 +21,13 @@ export function LoginPage() {
     []
   );
 
-  if (isAuthenticated) {
-    // If already logged in, go to dashboard.
-    navigate("/dashboard", { replace: true });
-  }
+  // Redirecting is a side-effect; do it in an effect to avoid updating the router
+  // during render (which causes warnings and can lead to unexpected navigation in tests).
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate("/dashboard", { replace: true });
+    }
+  }, [isAuthenticated, navigate]);
 
   const onSubmit = (e) => {
     e.preventDefault();
