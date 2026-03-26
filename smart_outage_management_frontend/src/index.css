@@ -1,13 +1,165 @@
+/* Ocean Professional theme - global styles and tokens */
+:root {
+  --ocean-primary: #2563eb; /* blue */
+  --ocean-secondary: #f59e0b; /* amber */
+  --ocean-success: #f59e0b;
+  --ocean-danger: #ef4444;
+
+  --bg: #f9fafb;
+  --surface: #ffffff;
+  --surface-2: #f3f4f6;
+
+  --text: #111827;
+  --muted: #6b7280;
+
+  --border: rgba(17, 24, 39, 0.10);
+  --shadow: 0 10px 30px rgba(17, 24, 39, 0.08);
+
+  --radius-lg: 16px;
+  --radius-md: 12px;
+  --radius-sm: 10px;
+
+  --sidebar-w: 272px;
+
+  --focus: 0 0 0 4px rgba(37, 99, 235, 0.18);
+
+  --font: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica,
+    Arial, "Apple Color Emoji", "Segoe UI Emoji";
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+}
+
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
+  font-family: var(--font);
+  color: var(--text);
+  background: radial-gradient(1200px 600px at 20% 0%, rgba(37, 99, 235, 0.10), transparent 50%),
+    radial-gradient(900px 500px at 80% 0%, rgba(245, 158, 11, 0.10), transparent 55%),
+    var(--bg);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+a {
+  color: inherit;
+}
+
+button,
+input,
+select {
+  font-family: inherit;
+}
+
+:focus-visible {
+  outline: none;
+  box-shadow: var(--focus);
+  border-radius: 10px;
+}
+
+/* Layout helpers */
+.app-shell {
+  display: grid;
+  grid-template-columns: var(--sidebar-w) 1fr;
+  min-height: 100vh;
+}
+
+@media (max-width: 960px) {
+  .app-shell {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Shared components */
+.surface {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow);
+}
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  box-shadow: 0 10px 26px rgba(17, 24, 39, 0.06);
+}
+
+.small {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: rgba(17, 24, 39, 0.02);
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.badge-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: var(--muted);
+}
+
+.badge-dot.ok {
+  background: var(--ocean-secondary);
+}
+
+.badge-dot.bad {
+  background: var(--ocean-danger);
+}
+
+.kbtn {
+  appearance: none;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  padding: 10px 12px;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: transform 150ms ease, box-shadow 150ms ease, background 150ms ease;
+}
+
+.kbtn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 12px 26px rgba(17, 24, 39, 0.10);
+}
+
+.kbtn.primary {
+  border-color: rgba(37, 99, 235, 0.25);
+  background: linear-gradient(180deg, rgba(37, 99, 235, 0.12), rgba(37, 99, 235, 0.06));
+}
+
+.kbtn.danger {
+  border-color: rgba(239, 68, 68, 0.25);
+  background: linear-gradient(180deg, rgba(239, 68, 68, 0.12), rgba(239, 68, 68, 0.06));
+}
+
+.kinput {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.9);
+}
+
+.hr {
+  height: 1px;
+  background: var(--border);
+  border: 0;
+  margin: 14px 0;
 }
